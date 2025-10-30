@@ -51,12 +51,19 @@
             <p class="text-muted mb-0">@Model.TotalProducts products found</p>
         </div>
     </div>
-
+    <img src="https://drive.google.com/uc?export=view&id=1vuN8kqQkK5E1fVhtv56klBPAq5NG_e0F"
+         alt="huijk"
+         class="img"
+         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" />
     <!-- Products Table -->
     <div class="row">
+        
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-body p-0">
+                    <img src="https://drive.google.com/thumbnail?id=1vuN8kqQkK5E1fVhtv56klBPAq5NG_e0F&sz=w200" alt="Alternate Text" />
+
+                    
                     <div class="table-responsive">
                         <table class="table table-hover mb-0" id="productsTable">
                             <thead class="table-light">
@@ -81,8 +88,30 @@
                                         <tr>
                                             <td>@product.PrdName</td>
                                             <td>@product.Barcode</td>
-                                            <td>@product.ImagePath</td>   
-                                            <td><img /></td>
+                                            <td>@product.ImagePath</td>
+                                            <td>
+                                               @*  <img src="https://drive.google.com/uc?export=view&id=1P--Lyx3vv5U1Ia3Cu7vxxGGcz1RyHftn"
+                                                     alt="Drive image"
+                                                     style="width:100px;height:100px;object-fit:cover;border-radius:8px;" /> *@
+                                                <img src="https://drive.google.com/thumbnail?id=1vuN8kqQkK5E1fVhtv56klBPAq5NG_e0F&sz=w200" alt="Alternate Text" />
+
+                                            <td>
+
+                                                <iframe src="https://drive.google.com/file/d/1Nk1TMpWNlPkNjt7W-hAuJ_TDTXaVAtkJ/preview"></iframe>
+
+                                                @if (!string.IsNullOrEmpty(product.ImagePath))
+                                                {
+                                                  
+
+                                                }
+                                                else
+                                                {
+                                                    <div class="bg-light d-flex align-items-center justify-content-center"
+                                                         style="width: 50px; height: 50px; border-radius: 8px;">
+                                                        <i class="bi bi-image text-muted"></i>
+                                                    </div>
+                                                }
+                                            </td>
                                             <td>@product.SSName</td>
                                             <td>@product.BTName</td>
                                             <td>@product.GroupName</td>
