@@ -1,0 +1,350 @@
+﻿@model RetailPharmaToFoodPanda.Models.StyleSizeSearchResult
+
+<div class="container-fluid py-4">
+    <!-- Google Drive Authentication Alert -->
+    @if (ViewBag.IsGoogleDriveAuthenticated == false)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Google Drive not connected!</strong> You need to authorize Google Drive to upload product images.
+            <a href="@Url.Action("Authorize", "GoogleDrive", new { returnUrl = Context.Request.Path })"
+               class="btn btn-sm btn-warning ms-3">
+                <i class="bi bi-google"></i> Connect Now
+            </a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong>Google Drive Connected!</strong> You can now upload product images.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+  @*   <div class="row mb-4">
+        <div class="col-12">
+            <h2>Product Management</h2>
+           
+        </div>
+    </div> *@
+
+    <!-- Search Bar -->
+    <div class="row mb-4 justify-content-end">
+        <div class="col-md-4">
+            <div class="input-group input-group-lg">
+                
+                <input type="text"
+                       class="form-control border-start-0 ps-30"
+                       id="searchInput"
+                       placeholder="Search by BTName..."
+                       value="@Model.SearchQuery">
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results Header -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h5 class="mb-0">Search Results</h5>
+            <p class="text-muted mb-0">@Model.TotalProducts products found</p>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="productsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Barcode</th>
+                                    <th>ImgPath</th>
+                                    <th>Image</th>
+                                    <th>SSName</th>
+                                    <th>BTName</th>
+                                    <th>Category</th>
+                                    <th>Buffer Qty</th>
+                                    <th>EC Product</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productTableBody">
+                                @if (Model.StyleSizes != null && Model.StyleSizes.Count > 0)
+                                {
+                                    @foreach (var product in Model.StyleSizes)
+                                    {
+                                        <tr>
+                                            <td>@product.PrdName</td>
+                                            <td>@product.Barcode</td>
+                                            <td>@product.ImagePath</td>   
+                                            <td><img /></td>
+                                            <td>@product.SSName</td>
+                                            <td>@product.BTName</td>
+                                            <td>@product.GroupName</td>
+                                            <td>
+                                                <input type="number"
+                                                       class="form-control form-control-sm"
+                                                       value="@product.BufferQty"
+                                                       style="width: 80px;"
+                                                       readonly>
+                                            </td>
+                                            <td>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                    @(product.ECProduct == true ? "checked" : "")
+                                                           disabled>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary edit-btn"
+                                                        data-barcode="@product.sBarcode"
+                                                        data-bufferqty="@product.BufferQty"
+                                                        data-ec="@product.ECProduct"
+                                                        data-imagepath="@product.ImagePath">
+                                                    <i class="bi bi-pencil"></i> Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="9" class="text-center text-muted">No products found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="editProductForm">
+                <div class="modal-body">
+                    <input type="hidden" id="sBarcode" name="sBarcode" />
+
+                    <div class="mb-3">
+                        <label for="bufferQty" class="form-label">Buffer Quantity</label>
+                        <input type="number" class="form-control" id="bufferQty" name="BufferQty" required />
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="isECProduct" name="IsECProduct" />
+                        <label class="form-check-label" for="isECProduct">EC Product</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Product Image</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="file" id="imageFile" accept="image/*" class="form-control" style="max-width:70%;">
+                            <button type="button" id="uploadBtn" class="btn btn-secondary">
+                                <i class="bi bi-cloud-upload"></i> Upload
+                            </button>
+                        </div>
+                        <div class="mt-2 text-center">
+                            <img id="previewImage" src="" alt="Preview" class="img-thumbnail mt-2" style="max-height: 120px; display: none;" />
+                        </div>
+                        <input type="hidden" id="imagePath" name="ImagePath" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+
+            // Search functionality
+            let searchTimeout;
+            $('#searchInput').on('input', function () {
+                clearTimeout(searchTimeout);
+                const query = $(this).val();
+
+                searchTimeout = setTimeout(function () {
+                    window.location.href = `/Product/ProductSearch?searchQuery=${encodeURIComponent(query)}`;
+                }, 500);
+            });
+
+            // Open modal & fill data
+            $('.edit-btn').on('click', function () {
+                const barcode = $(this).data('barcode');
+                const bufferQty = $(this).data('bufferqty');
+                const ec = $(this).data('ec') === true || $(this).data('ec') === "True";
+                const imagePath = $(this).data('imagepath');
+
+                $('#sBarcode').val(barcode);
+                $('#bufferQty').val(bufferQty);
+                $('#isECProduct').prop('checked', ec);
+                $('#imagePath').val(imagePath || '');
+
+                if (imagePath) {
+                    $('#previewImage').attr('src', imagePath).show();
+                } else {
+                    $('#previewImage').hide();
+                }
+
+                $('#editProductModal').modal('show');
+            });
+
+            // Preview new image before upload
+            $('#imageFile').on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#previewImage').attr('src', e.target.result).show();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Upload image to Google Drive
+            $('#uploadBtn').on('click', async function () {
+                const file = $('#imageFile')[0].files[0];
+
+                if (!file) {
+                    return Swal.fire('Warning', 'Please select an image first!', 'warning');
+                }
+
+                const uploadBtn = $(this);
+                const originalText = uploadBtn.html();
+
+                try {
+                    uploadBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Uploading...');
+
+                    const formData = new FormData();
+                    formData.append('imageFile', file);
+
+                    const response = await $.ajax({
+                        url: '/Product/UploadImage',
+                        type: 'POST',
+                        processData: false,
+                        contentType: false,
+                        data: formData
+                    });
+
+                    if (response.success) {
+                        $('#imagePath').val(response.imagePath);
+                        $('#previewImage').attr('src', response.imagePath).show();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Image uploaded to Google Drive successfully',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else if (response.requireAuth) {
+                        // Show authorization required dialog
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Authorization Required',
+                            text: response.message,
+                            showCancelButton: true,
+                            confirmButtonText: 'Connect Google Drive',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = response.authUrl || '/GoogleDrive/Authorize?returnUrl=' + encodeURIComponent(window.location.pathname);
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    Swal.fire('Error', 'Failed to upload image. Please try again.', 'error');
+                } finally {
+                    uploadBtn.prop('disabled', false).html(originalText);
+                }
+            });
+
+            // Save updated product
+            $('#editProductForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const data = {
+                    sBarcode: $('#sBarcode').val(),
+                    BufferQty: parseInt($('#bufferQty').val()),
+                    ECProduct: $('#isECProduct').is(':checked'),
+                    ImagePath: $('#imagePath').val()
+                };
+
+                $.ajax({
+                    url: '/Product/Update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#editProductModal').modal('hide');
+                            Swal.fire('Success', 'Product updated successfully', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'Failed to update product', 'error');
+                    }
+                });
+            });
+
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .product-image-placeholder {
+            width: 50px;
+            height: 50px;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .form-check-input:disabled {
+            opacity: 0.5;
+        }
+
+        #searchInput {
+            border-radius: 25px;
+            padding: 12px 20px;
+        }
+
+        .input-group-text {
+            border-radius: 25px 0 0 25px;
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+    </style>
+}
