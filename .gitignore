@@ -363,3 +363,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsdRetailPharmaToFoodPanda/wwwroot/client-secret.json
 RetailPharmaToFoodPanda/appsettings.json
+RetailPharmaToFoodPanda/wwwroot/client-secret.json
+RetailPharmaToFoodPanda/appsettings.json
