@@ -52,12 +52,7 @@ public class StyleSizeService : IStyleSizeService
         }
     }
 
-
-    //public async Task<StyleSize?> GetProductByIdAsync(int id)
-    //{
-    //    return await _context.Products.FindAsync(id);
-    //}
-
+    
     public async Task<bool> UpdateProductAsync(ProductUpdateModel model)
     {
         try

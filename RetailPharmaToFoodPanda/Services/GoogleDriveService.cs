@@ -97,7 +97,7 @@ public class GoogleDriveService : IGoogleDriveService
             var fileMetadata = new Google.Apis.Drive.v3.Data.File
             {
                 Name = fileName,
-                Parents = new[] { folderId } // ✅ Direct folder ID
+                Parents = new[] { folderId } 
             };
 
             Google.Apis.Drive.v3.Data.File uploadedFile;
