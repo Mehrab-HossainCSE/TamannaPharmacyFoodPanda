@@ -14,6 +14,7 @@ namespace RetailPharmaToFoodPanda.Controllers
             _googleDriveService = googleDriveService;
         }
 
+       // [HttpGet("Product/ProductSearch/{searchQuery?}")]
         public async Task<IActionResult> ProductSearch(string? searchQuery)
         {
             StyleSizeSearchResult result;

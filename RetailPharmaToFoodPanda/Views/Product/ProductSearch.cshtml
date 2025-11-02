@@ -31,7 +31,13 @@
     </div> *@
 
     <!-- Search Bar -->
-    <div class="row mb-4 justify-content-end">
+@*     <div class="row mb-4 g-3 justify-content-between">
+
+        <div class="col-6">
+            <h5 class="mb-0">Search Results</h5>
+            <p class="text-muted mb-0">@Model.TotalProducts products found</p>
+        </div>
+
         <div class="col-md-4">
             <div class="input-group input-group-lg">
                 
@@ -42,26 +48,38 @@
                        value="@Model.SearchQuery">
             </div>
         </div>
-    </div>
+    </div> *@
+    <div class="row align-items-center mb-4">
 
-    <!-- Search Results Header -->
-    <div class="row mb-3">
-        <div class="col-12">
+        <!-- Left side: title + count -->
+        <div class="col-md-6">
             <h5 class="mb-0">Search Results</h5>
             <p class="text-muted mb-0">@Model.TotalProducts products found</p>
         </div>
+
+        <!-- Right side: search bar -->
+        <div class="col-md-4 ms-auto text-end">
+            <div class="input-group input-group-lg">
+                <input type="text"
+                       class="form-control border-start-0 ps-3"
+                       id="searchInput"
+                       placeholder="Search by BTName..."
+                       value="@Model.SearchQuery">
+            </div>
+        </div>
     </div>
-    <img src="https://drive.google.com/uc?export=view&id=1vuN8kqQkK5E1fVhtv56klBPAq5NG_e0F"
-         alt="huijk"
-         class="img"
-         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" />
+
+
+
+   
+    
     <!-- Products Table -->
     <div class="row">
         
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-body p-0">
-                    <img src="https://drive.google.com/thumbnail?id=1vuN8kqQkK5E1fVhtv56klBPAq5NG_e0F&sz=w200" alt="Alternate Text" />
+                    
 
                     
                     <div class="table-responsive">
@@ -88,29 +106,30 @@
                                         <tr>
                                             <td>@product.PrdName</td>
                                             <td>@product.Barcode</td>
-                                            <td>@product.ImagePath</td>
-                                            <td>
-                                               @*  <img src="https://drive.google.com/uc?export=view&id=1P--Lyx3vv5U1Ia3Cu7vxxGGcz1RyHftn"
-                                                     alt="Drive image"
-                                                     style="width:100px;height:100px;object-fit:cover;border-radius:8px;" /> *@
-                                                <img src="https://drive.google.com/thumbnail?id=1vuN8kqQkK5E1fVhtv56klBPAq5NG_e0F&sz=w200" alt="Alternate Text" />
+                                            <td style="width: 300px;">@product.ImagePath</td>
+                                         
 
                                             <td>
+                                                    @if (!string.IsNullOrEmpty(product.ImagePath))
+                                                    {
+                                                        @* Extract file ID and create preview URL *@
+                                                        var previewUrl = product.ImagePath.Contains("id=")
+                                                        ? $"https://drive.google.com/file/d/{product.ImagePath.Split("id=")[1].Split("&")[0]}/preview"
+                                                        : product.ImagePath;
 
-                                                <iframe src="https://drive.google.com/file/d/1Nk1TMpWNlPkNjt7W-hAuJ_TDTXaVAtkJ/preview"></iframe>
-
-                                                @if (!string.IsNullOrEmpty(product.ImagePath))
-                                                {
-                                                  
-
-                                                }
-                                                else
-                                                {
+                                                    <iframe src="@previewUrl"
+                                                            width="100"
+                                                            height="100"
+                                                            ;">
+                                                    </iframe>
+                                                    }
+                                                    else
+                                                    {
                                                     <div class="bg-light d-flex align-items-center justify-content-center"
-                                                         style="width: 50px; height: 50px; border-radius: 8px;">
+                                                         style="width: 100px; height: 100px; border-radius: 8px;">
                                                         <i class="bi bi-image text-muted"></i>
                                                     </div>
-                                                }
+                                                    }
                                             </td>
                                             <td>@product.SSName</td>
                                             <td>@product.BTName</td>
@@ -207,144 +226,153 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(document).ready(function () {
+            $(document).ready(function () {
+        // Generate URLs properly for production/virtual directory support
+        const uploadImageUrl = '@Url.Action("UploadImage", "Product")';
+        const updateProductUrl = '@Url.Action("Update", "Product")';
+        const baseUrl = '@Url.Content("~/")';
 
-            // Search functionality
-            let searchTimeout;
-            $('#searchInput').on('input', function () {
-                clearTimeout(searchTimeout);
-                const query = $(this).val();
+        // Search functionality (this already works correctly)
+        let searchTimeout;
+        $('#searchInput').on('input', function () {
+            clearTimeout(searchTimeout);
+            const query = $(this).val();
 
-                searchTimeout = setTimeout(function () {
-                    window.location.href = `/Product/ProductSearch?searchQuery=${encodeURIComponent(query)}`;
-                }, 500);
-            });
+            searchTimeout = setTimeout(function () {
+                const queryParam = encodeURIComponent(query);
+                window.location.href = `${baseUrl}Product/ProductSearch?searchQuery=${queryParam}`;
+            }, 500);
+        });
 
-            // Open modal & fill data
-            $('.edit-btn').on('click', function () {
-                const barcode = $(this).data('barcode');
-                const bufferQty = $(this).data('bufferqty');
-                const ec = $(this).data('ec') === true || $(this).data('ec') === "True";
-                const imagePath = $(this).data('imagepath');
+        // Open modal & fill data (no changes needed)
+        $('.edit-btn').on('click', function () {
+            const barcode = $(this).data('barcode');
+            const bufferQty = $(this).data('bufferqty');
+            const ec = $(this).data('ec') === true || $(this).data('ec') === "True";
+            const imagePath = $(this).data('imagepath');
 
-                $('#sBarcode').val(barcode);
-                $('#bufferQty').val(bufferQty);
-                $('#isECProduct').prop('checked', ec);
-                $('#imagePath').val(imagePath || '');
+            $('#sBarcode').val(barcode);
+            $('#bufferQty').val(bufferQty);
+            $('#isECProduct').prop('checked', ec);
+            $('#imagePath').val(imagePath || '');
 
-                if (imagePath) {
-                    $('#previewImage').attr('src', imagePath).show();
-                } else {
-                    $('#previewImage').hide();
-                }
+            if (imagePath) {
+                $('#previewImage').attr('src', imagePath).show();
+            } else {
+                $('#previewImage').hide();
+            }
 
-                $('#editProductModal').modal('show');
-            });
+            $('#editProductModal').modal('show');
+        });
 
-            // Preview new image before upload
-            $('#imageFile').on('change', function () {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        $('#previewImage').attr('src', e.target.result).show();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+        // Preview new image before upload (no changes needed)
+        $('#imageFile').on('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#previewImage').attr('src', e.target.result).show();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-            // Upload image to Google Drive
-            $('#uploadBtn').on('click', async function () {
-                const file = $('#imageFile')[0].files[0];
+        // Upload image to Google Drive - FIXED URL
+        $('#uploadBtn').on('click', async function () {
+            const file = $('#imageFile')[0].files[0];
 
-                if (!file) {
-                    return Swal.fire('Warning', 'Please select an image first!', 'warning');
-                }
+            if (!file) {
+                return Swal.fire('Warning', 'Please select an image first!', 'warning');
+            }
 
-                const uploadBtn = $(this);
-                const originalText = uploadBtn.html();
+            const uploadBtn = $(this);
+            const originalText = uploadBtn.html();
 
-                try {
-                    uploadBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Uploading...');
+            try {
+                uploadBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Uploading...');
 
-                    const formData = new FormData();
-                    formData.append('imageFile', file);
+                const formData = new FormData();
+                formData.append('imageFile', file);
 
-                    const response = await $.ajax({
-                        url: '/Product/UploadImage',
-                        type: 'POST',
-                        processData: false,
-                        contentType: false,
-                        data: formData
+                const response = await $.ajax({
+                    url: uploadImageUrl,  // ✅ Use generated URL instead of hardcoded
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    data: formData
+                });
+
+                if (response.success) {
+                    $('#imagePath').val(response.imagePath);
+                    $('#previewImage').attr('src', response.imagePath).show();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Image uploaded to Google Drive successfully',
+                        timer: 2000,
+                        showConfirmButton: false
                     });
+                } else if (response.requireAuth) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Authorization Required',
+                        text: response.message,
+                        showCancelButton: true,
+                        confirmButtonText: 'Connect Google Drive',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const appBase = '@Url.Content("~/")';
+                            const relativePath = window.location.pathname.replace(appBase.slice(0, -1), ''); 
+                            const returnUrl = encodeURIComponent(relativePath + window.location.search);
+                            window.location.href = response.authUrl || `${appBase}GoogleDrive/Authorize?returnUrl=${returnUrl}`;
+                        }
+                    });
+                } else {
+                    Swal.fire('Error', response.message, 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                Swal.fire('Error', 'Failed to upload image. Please try again.', 'error');
+            } finally {
+                uploadBtn.prop('disabled', false).html(originalText);
+            }
+        });
 
+        // Save updated product - FIXED URL
+        $('#editProductForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const data = {
+                sBarcode: $('#sBarcode').val(),
+                BufferQty: parseInt($('#bufferQty').val()),
+                ECProduct: $('#isECProduct').is(':checked'),
+                ImagePath: $('#imagePath').val()
+            };
+
+            $.ajax({
+                url: updateProductUrl,  // ✅ Use generated URL instead of hardcoded
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
                     if (response.success) {
-                        $('#imagePath').val(response.imagePath);
-                        $('#previewImage').attr('src', response.imagePath).show();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: 'Image uploaded to Google Drive successfully',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    } else if (response.requireAuth) {
-                        // Show authorization required dialog
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Authorization Required',
-                            text: response.message,
-                            showCancelButton: true,
-                            confirmButtonText: 'Connect Google Drive',
-                            cancelButtonText: 'Cancel'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = response.authUrl || '/GoogleDrive/Authorize?returnUrl=' + encodeURIComponent(window.location.pathname);
-                            }
-                        });
+                        $('#editProductModal').modal('hide');
+                        Swal.fire('Success', 'Product updated successfully', 'success')
+                            .then(() => location.reload());
                     } else {
                         Swal.fire('Error', response.message, 'error');
                     }
-                } catch (error) {
-                    console.error('Upload error:', error);
-                    Swal.fire('Error', 'Failed to upload image. Please try again.', 'error');
-                } finally {
-                    uploadBtn.prop('disabled', false).html(originalText);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Update error:', error);
+                    console.error('Status:', status);
+                    console.error('Response:', xhr.responseText);
+                    Swal.fire('Error', 'Failed to update product', 'error');
                 }
             });
-
-            // Save updated product
-            $('#editProductForm').on('submit', function (e) {
-                e.preventDefault();
-
-                const data = {
-                    sBarcode: $('#sBarcode').val(),
-                    BufferQty: parseInt($('#bufferQty').val()),
-                    ECProduct: $('#isECProduct').is(':checked'),
-                    ImagePath: $('#imagePath').val()
-                };
-
-                $.ajax({
-                    url: '/Product/Update',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.success) {
-                            $('#editProductModal').modal('hide');
-                            Swal.fire('Success', 'Product updated successfully', 'success')
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire('Error', response.message, 'error');
-                        }
-                    },
-                    error: function () {
-                        Swal.fire('Error', 'Failed to update product', 'error');
-                    }
-                });
-            });
-
         });
+    });
     </script>
 }
 

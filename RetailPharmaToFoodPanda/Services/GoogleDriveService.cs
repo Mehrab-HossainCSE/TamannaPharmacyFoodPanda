@@ -26,49 +26,7 @@ public class GoogleDriveService : IGoogleDriveService
         return !string.IsNullOrEmpty(token);
     }
 
-    //private async Task<DriveService> GetDriveServiceAsync()
-    //{
-    //    var session = _httpContextAccessor.HttpContext?.Session;
-
-    //    var accessToken = session?.GetString("GoogleAccessToken");
-    //    var refreshToken = session?.GetString("GoogleRefreshToken");
-    //    var expiresIn = session?.GetString("GoogleExpiresIn");
-
-    //    if (string.IsNullOrEmpty(accessToken))
-    //        throw new UnauthorizedAccessException("Not authenticated. Please authorize with Google Drive first.");
-
-    //    // Load credentials
-    //    var credentialsPath = Path.Combine(_env.WebRootPath, "Credentials.json");
-    //    var secrets = GoogleClientSecrets.FromStream(
-    //        new FileStream(credentialsPath, FileMode.Open, FileAccess.Read)
-    //    ).Secrets;
-
-    //    // Create token response
-    //    var tokenResponse = new TokenResponse
-    //    {
-    //        AccessToken = accessToken,
-    //        RefreshToken = refreshToken,
-    //        ExpiresInSeconds = string.IsNullOrEmpty(expiresIn) ? 3600 : long.Parse(expiresIn),
-    //        IssuedUtc = DateTime.UtcNow
-    //    };
-
-    //    // Create flow
-    //    var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
-    //    {
-    //        ClientSecrets = secrets,
-    //        Scopes = new[] { DriveService.Scope.DriveFile }
-    //    });
-
-    //    // Create credential
-    //    var credential = new UserCredential(flow, "user", tokenResponse);
-
-    //    // Return Drive service
-    //    return new DriveService(new BaseClientService.Initializer
-    //    {
-    //        HttpClientInitializer = credential,
-    //        ApplicationName = "RetailPharmaToFoodPanda"
-    //    });
-    //}
+  
     private async Task<DriveService> GetDriveServiceAsync()
     {
         var session = _httpContextAccessor.HttpContext?.Session;
