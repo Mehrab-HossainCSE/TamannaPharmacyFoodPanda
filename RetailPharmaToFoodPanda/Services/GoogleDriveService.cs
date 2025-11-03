@@ -130,8 +130,7 @@ public class GoogleDriveService : IGoogleDriveService
                 FileName = publicUrl,
                 Message = "Upload successful"
             };
-            // Return public URL
-           // return $"https://drive.google.com/uc?export=view&id={uploadedFile.Id}";
+           
         }
         catch (Exception ex)
         {

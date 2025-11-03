@@ -15,10 +15,10 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<StyleSize> StyleSizes { get; set; }
 
-    // ✅ Call this ONCE before creating the context
+   
     public static void DiscoverColumns(string connectionString)
     {
-        if (_availableColumns != null) return; // Already discovered
+        if (_availableColumns != null) return; 
 
         _availableColumns = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
 
@@ -50,7 +50,7 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.sBarcode);
             entity.Property(e => e.sBarcode).IsRequired();
 
-            // ✅ Ignore properties not in the database
+            
             var allProps = typeof(StyleSize).GetProperties();
             foreach (var prop in allProps)
             {

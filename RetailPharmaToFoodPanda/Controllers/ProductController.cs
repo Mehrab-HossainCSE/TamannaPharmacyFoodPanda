@@ -14,19 +14,19 @@ namespace RetailPharmaToFoodPanda.Controllers
             _googleDriveService = googleDriveService;
         }
 
-       // [HttpGet("Product/ProductSearch/{searchQuery?}")]
+      
         public async Task<IActionResult> ProductSearch(string? searchQuery)
         {
             StyleSizeSearchResult result;
 
             if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                // 🔍 Search by query
+                
                 result = await _styleSizeService.SearchProductsAsync(searchQuery);
             }
             else
             {
-                // 📦 Load all products (default view)
+                
                 result = await _styleSizeService.GetAllProduct();
             }
 
@@ -87,9 +87,7 @@ namespace RetailPharmaToFoodPanda.Controllers
                 return Json(new { success = false, message = "Invalid data" });
 
             try
-            {
-                // Your update logic here
-                // await _styleSizeService.UpdateProductAsync(model);
+            {               
              var   result = await _styleSizeService.UpdateProductAsync(model);
                 if (!result)
                     return Json(new { success = false, message = "Failed to update product." });
@@ -102,6 +100,5 @@ namespace RetailPharmaToFoodPanda.Controllers
             }
         }
     }
-
 
 }
