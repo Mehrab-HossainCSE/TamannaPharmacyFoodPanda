@@ -13,15 +13,18 @@ namespace RetailPharmaToFoodPanda
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromHours(2);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
-            // ? Register ApplicationDbContext
+
+            // ? STEP 1: Get connection string
+            var connectionString = builder.Configuration.GetConnectionString("sqlConnection");
+
+            // ? STEP 2: Discover columns BEFORE registering DbContext
+            ApplicationDbContext.DiscoverColumns(connectionString);
+
+            // ? STEP 3: Register ApplicationDbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("sqlConnection")));
+                options.UseSqlServer(connectionString));
+
+            // Session configuration (removed duplicate)
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(2);
@@ -29,9 +32,11 @@ namespace RetailPharmaToFoodPanda
                 options.Cookie.IsEssential = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
-            // ? Register your custom service
+
+            // Register your custom services
             builder.Services.AddScoped<IStyleSizeService, StyleSizeService>();
             builder.Services.AddScoped<IGoogleDriveService, GoogleDriveService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -43,9 +48,7 @@ namespace RetailPharmaToFoodPanda
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseSession();
             app.UseAuthorization();
 

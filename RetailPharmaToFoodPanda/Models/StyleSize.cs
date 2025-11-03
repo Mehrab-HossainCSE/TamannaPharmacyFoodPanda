@@ -50,11 +50,8 @@
 
     public class StyleSizeViewModel
     {
-        public string? CMPIDX { get; set; }
-
-        // This appears to be the Primary Key
+        public string? CMPIDX { get; set; }       
         public string sBarcode { get; set; }
-
         public string Barcode { get; set; }
         public string CSSID { get; set; }
         public string SSID { get; set; }
@@ -88,5 +85,6 @@
         public List<StyleSize> StyleSizes { get; set; } = new();
         public int TotalProducts { get; set; }
         public string SearchQuery { get; set; } = string.Empty;
+        public string? ErrorMessage { get; set; }
     }
 }

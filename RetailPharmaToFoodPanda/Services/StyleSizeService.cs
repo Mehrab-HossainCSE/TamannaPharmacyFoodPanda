@@ -97,8 +97,14 @@ public class StyleSizeService : IStyleSizeService
         }
         catch (Exception ex)
         {
-           
-            return new StyleSizeSearchResult();
+
+            return new StyleSizeSearchResult
+            {
+                StyleSizes = new List<StyleSize>(),
+                TotalProducts = 0,
+                SearchQuery = string.Empty,
+                ErrorMessage = ex.Message // <-- send exception message to the view
+            };
         }
     }
 }
